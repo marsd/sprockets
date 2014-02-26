@@ -25,8 +25,17 @@ class StaticFilesGenerator implements Interfaces\StaticFilesGeneratorInterface
         $cache = $this->parser->config['cache_server'];
 
         $this->written = array();
-        $this->manifest = $cache->has($key) ? json_decode($cache->get($key)) : array();
-
+        if ($cache->has($key))
+        {
+            $cache_object = json_decode($cache->get($key));
+            $cache_array = is_object($cache_object) ? get_object_vars($cache_object) : $cache_object;
+            $this->manifest = $cache_array;
+        }
+        else 
+        {
+            $this->manifest = array();
+        }
+        
         foreach ($paths as $path)
         {
             list($all, $written) = $this->createFilesForPath($base . '/' . $path, $outputPath, $overwrite = false);
